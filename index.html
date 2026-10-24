@@ -25,6 +25,7 @@
         --bar-track: #f0e4cf;
         --shadow: 0 6px 0 rgba(35, 48, 68, .08);
         --sec-math: #ff8a3d;
+        --sec-shape: #12b5a5;
         --sec-word: #3d9bff;
         --sec-logic: #8a5cf6;
       }
@@ -71,6 +72,7 @@
       .section-title { font-size: 30px; margin: 30px 0 14px; display: flex; align-items: center; gap: 10px; }
       .section-title span.dot { color: #fff; border-radius: 14px; padding: 2px 12px; font-size: 22px; }
       .sec-math .dot { background: var(--sec-math); }
+      .sec-shape .dot { background: var(--sec-shape); }
       .sec-word .dot { background: var(--sec-word); }
       .sec-logic .dot { background: var(--sec-logic); }
 
@@ -99,6 +101,7 @@
       .opt.selected .letter { color: var(--ink); }
       .opt.emoji { font-size: 46px; }
       .opt.word { font-size: 56px; }
+      .opt.jp { font-size: 23px; line-height: 1.4; word-break: break-all; }
 
       body.submitted .opt { cursor: default; }
       .opt.correct { background: var(--good-bg) !important; border-color: var(--good) !important; }
@@ -136,6 +139,7 @@
         .opt { min-height: 96px; font-size: 34px; }
         .opt.emoji { font-size: 40px; }
         .opt.word { font-size: 50px; }
+        .opt.jp { font-size: 19px; }
         .btn { font-size: 23px; padding: 18px 24px; }
         .section-title { font-size: 26px; }
       }
@@ -145,12 +149,12 @@
     <div class="wrap">
       <header class="hero">
         <div class="mascot">🦊</div>
-        <h1>Kids Quiz · Day 1 · 2026-10-24</h1>
-        <p>点一点你觉得对的答案，选完点下面的按钮看星星！</p>
+        <h1>Kids Quiz · 幼稚園面接練習 第1套 · 2026-10-24</h1>
+        <p>先生の言うことをよく聞いて、合うものをタップしてね。<br />（听好问题，点一点你觉得对的答案）</p>
       </header>
 
       <div class="progress-box">
-        <div class="progress-label">已经答了 <b id="doneCount">0</b> / 12 题</div>
+        <div class="progress-label">已经答了 <b id="doneCount">0</b> / 20 题</div>
         <div class="bar"><div id="barFill"></div></div>
       </div>
 
@@ -166,92 +170,142 @@
 
       <div class="submit-zone" id="submitZone">
         <button class="btn" id="submitBtn" type="button">⭐ 看看我得了几颗星</button>
-        <div class="hint" id="submitHint">先把 12 道题都选完哦～</div>
+        <div class="hint" id="submitHint">先把 20 道题都选完哦～</div>
       </div>
     </div>
 
     <script>
       var QUIZ = [
         { sec: "math",
-          text: "数一数，一共有几个苹果？",
-          visual: "🍎🍎🍎🍎",
-          options: ["3", "4", "5"], optClass: "",
+          text: "かぞえてみよう。りんごは いくつ？",
+          visual: "🍎🍎🍎🍎🍎🍎",
+          options: ["5", "6", "7"], optClass: "",
           answer: 1,
-          explain: "我们一起数：1、2、3、4，一共 4 个苹果！" },
+          explain: "一个一个数：1、2、3、4、5、6，一共 6 个。" },
         { sec: "math",
-          text: "哪个是数字 5？",
+          text: "すうじの「7」は どれ？",
           visual: "",
-          options: ["2", "8", "5"], optClass: "",
+          options: ["1", "9", "7"], optClass: "",
           answer: 2,
-          explain: "5 像一个小钩子，就是它！" },
+          explain: "7 像一把小镰刀，就是它。" },
         { sec: "math",
-          text: "一共有几个香蕉？",
-          visual: "🍌🍌 ＋ 🍌",
-          options: ["2", "4", "3"], optClass: "",
-          answer: 2,
-          explain: "2 个加 1 个，就是 3 个。" },
+          text: "いちごは いくつ？",
+          visual: "🍓🍓🍓 ＋ 🍓🍓",
+          options: ["4", "5", "6"], optClass: "",
+          answer: 1,
+          explain: "3 个加 2 个，一共 5 个草莓。" },
         { sec: "math",
-          text: "哪一边的小狗更多？",
+          text: "どっちが おおい？",
           visual: "",
-          options: ["🐶🐶", "🐶🐶🐶🐶", "🐶"], optClass: "emoji",
-          answer: 1,
-          explain: "第二边有 4 只小狗，是最多的！" },
-
-        { sec: "word",
-          text: "这是太阳。哪个字是「日」？",
-          visual: "☀️",
-          options: ["月", "日", "山"], optClass: "word",
-          answer: 1,
-          explain: "太阳就是「日」，方方正正的。" },
-        { sec: "word",
-          text: "小鱼在水里游。哪个字是「水」？",
-          visual: "🐟",
-          options: ["火", "木", "水"], optClass: "word",
-          answer: 2,
-          explain: "小鱼离不开水，「水」字中间一竖，两边水花开。" },
-        { sec: "word",
-          text: "大象很大很大。哪个字是「大」？",
-          visual: "🐘",
-          options: ["小", "人", "大"], optClass: "word",
-          answer: 2,
-          explain: "「大」像一个人张开手臂，好大好大！" },
-        { sec: "word",
-          text: "这是嘴巴。哪个字是「口」？",
-          visual: "👄",
-          options: ["目", "口", "耳"], optClass: "word",
-          answer: 1,
-          explain: "嘴巴就是「口」，像一个小方框。" },
-
-        { sec: "logic",
-          text: "接下来应该是什么？",
-          visual: "🔴🔵🔴🔵🔴？",
-          options: ["🔵", "🔴", "🟢"], optClass: "emoji",
+          options: ["🐤🐤🐤🐤🐤", "🐤🐤🐤", "🐤🐤🐤🐤"], optClass: "emoji",
           answer: 0,
-          explain: "红、蓝、红、蓝……轮到蓝色啦！" },
-        { sec: "logic",
-          text: "哪个和大家不一样？",
+          explain: "第一组有 5 只小鸡，是最多的。" },
+        { sec: "math",
+          text: "あと いくつで 10 になる？",
+          visual: "⭐⭐⭐⭐⭐⭐⭐⭐ ＋ ？",
+          options: ["1", "3", "2"], optClass: "",
+          answer: 2,
+          explain: "已经有 8 颗星星，再加 2 颗就是 10 颗。" },
+
+        { sec: "shape",
+          text: "「まる」は どれ？",
           visual: "",
-          options: ["🍓", "🐶", "🍇"], optClass: "emoji",
+          options: ["🔺", "⬛", "⚪"], optClass: "emoji",
+          answer: 2,
+          explain: "白色的圈圈是圆形（まる）。" },
+        { sec: "shape",
+          text: "「しかく」は どれ？",
+          visual: "",
+          options: ["🟦", "🔴", "🔺"], optClass: "emoji",
+          answer: 0,
+          explain: "蓝色的方块是四角形（しかく）。" },
+        { sec: "shape",
+          text: "「あかい まる」は どれ？",
+          visual: "",
+          options: ["🔵", "🟢", "🔴"], optClass: "emoji",
+          answer: 2,
+          explain: "又红又圆的，就是红色的圆（あかい まる）。" },
+        { sec: "shape",
+          text: "と おなじ かたちは どれ？",
+          visual: "⭐",
+          options: ["⭐", "🌙", "☁️"], optClass: "emoji",
+          answer: 0,
+          explain: "星星和星星，形状一模一样。" },
+        { sec: "shape",
+          text: "「さんかく」の かたちを したものは どれ？",
+          visual: "",
+          options: ["🍎", "🍕", "⚽"], optClass: "emoji",
           answer: 1,
-          explain: "草莓和葡萄是水果，小狗是小动物，不一样！" },
+          explain: "一块披萨是三角形的（さんかく）。" },
+
         { sec: "logic",
-          text: "哪个是圆圆的？",
-          visual: "",
-          options: ["⭐", "🔺", "⚪"], optClass: "emoji",
-          answer: 2,
-          explain: "白色的圈圈是圆形的，像皮球一样圆。" },
+          text: "つぎは どれ？",
+          visual: "🔺🔺🟦 🔺🔺 ？",
+          options: ["🟦", "🔺", "⭐"], optClass: "emoji",
+          answer: 0,
+          explain: "规律是「三角、三角、正方形」，所以接下来是正方形。" },
         { sec: "logic",
-          text: "哪个是交通工具，可以带我们出门？",
+          text: "なかまはずれは どれ？",
           visual: "",
-          options: ["🍔", "🧦", "🚗"], optClass: "emoji",
+          options: ["🍎", "🚗", "🍇"], optClass: "emoji",
+          answer: 1,
+          explain: "苹果和葡萄是水果，汽车不是，汽车不一样。" },
+        { sec: "logic",
+          text: "たべものは どれ？",
+          visual: "",
+          options: ["🍙", "🧦", "🧢"], optClass: "emoji",
+          answer: 0,
+          explain: "饭团是可以吃的食物。" },
+        { sec: "logic",
+          text: "いちばん ちいさいのは どれ？",
+          visual: "",
+          options: ["🐘", "🐶", "🐜"], optClass: "emoji",
           answer: 2,
-          explain: "汽车是交通工具，可以开着出门玩！" }
+          explain: "蚂蚁最小，大象最大。" },
+        { sec: "logic",
+          text: "つぎの すうじは？",
+          visual: "2、4、6、？",
+          options: ["7", "8", "9"], optClass: "",
+          answer: 1,
+          explain: "2、4、6 是双数排队，下一个是 8。" },
+
+        { sec: "word",
+          text: "あさ、せんせいに あったら なんていう？",
+          visual: "",
+          options: ["おはようございます", "おやすみなさい", "いただきます"], optClass: "jp",
+          answer: 0,
+          explain: "早上见到老师，要说「おはようございます」（早上好）。" },
+        { sec: "word",
+          text: "「あおい まるを 2つ」えらんでね。",
+          visual: "",
+          options: ["🔴🔴", "🔵", "🔵🔵"], optClass: "emoji",
+          answer: 2,
+          explain: "听清两个条件：蓝色（あおい）、2 个，两个蓝圈圈才对。" },
+        { sec: "word",
+          text: "「あか」は どれ？",
+          visual: "",
+          options: ["🟦", "🟥", "🟨"], optClass: "emoji",
+          answer: 1,
+          explain: "红色的方块是「あか」。" },
+        { sec: "word",
+          text: "たまごの つぎは？",
+          visual: "🥚 → 🐣 → ？",
+          options: ["🐤", "🥚", "🐔"], optClass: "emoji",
+          answer: 2,
+          explain: "鸡蛋孵出小鸡，小鸡长大变成大鸡。" },
+        { sec: "word",
+          text: "さっき みた くだものは どれ？",
+          visual: "🍎 🍌 🍇",
+          options: ["🍓", "🍊", "🍌"], optClass: "emoji",
+          answer: 2,
+          explain: "刚才看到的是苹果、香蕉和葡萄，香蕉在里面。" }
       ];
 
       var SECTIONS = {
-        math:  { title: "🔢 数学", cls: "sec-math",  tag: "数一数" },
-        word:  { title: "📖 认字", cls: "sec-word",  tag: "认一认" },
-        logic: { title: "🧩 逻辑", cls: "sec-logic", tag: "想一想" }
+        math:  { title: "🔢 かず", cls: "sec-math",  tag: "かず" },
+        shape: { title: "🔷 かたち・いろ", cls: "sec-shape", tag: "かたち・いろ" },
+        logic: { title: "🧩 ろんり", cls: "sec-logic", tag: "ろんり" },
+        word:  { title: "🗣️ ことば・しじ", cls: "sec-word",  tag: "ことば" }
       };
       var LETTERS = ["A", "B", "C"];
       var answers = new Array(QUIZ.length).fill(null);
@@ -373,9 +427,9 @@
         });
 
         var stars, cheer, mascot = "🦊";
-        if (correct === 12)      { stars = 3; cheer = "太棒了！全部答对！"; }
-        else if (correct >= 9)   { stars = 2; cheer = "很厉害！"; }
-        else if (correct >= 5)   { stars = 1; cheer = "做得好，继续加油！"; }
+        if (correct === QUIZ.length) { stars = 3; cheer = "太棒了！全部答对！"; }
+        else if (correct >= 15)  { stars = 2; cheer = "很厉害！"; }
+        else if (correct >= 8)   { stars = 1; cheer = "做得好，继续加油！"; }
         else                     { stars = 0; cheer = "没关系，再试一次，你可以的！"; mascot = "🐰"; }
 
         var starHtml = "";
@@ -384,7 +438,7 @@
         }
         document.getElementById("resultStars").innerHTML = starHtml;
         document.getElementById("resultMascot").textContent = mascot;
-        document.getElementById("resultScore").textContent = "答对了 " + correct + " / 12 题";
+        document.getElementById("resultScore").textContent = "答对了 " + correct + " / " + QUIZ.length + " 题";
         document.getElementById("resultCheer").textContent = cheer;
         document.getElementById("result").classList.add("show");
         document.getElementById("submitZone").style.display = "none";
