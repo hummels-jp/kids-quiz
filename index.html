@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Kids Quiz</title>
+    <style>
+      :root {
+        --bg: #fff7ea;
+        --card: #ffffff;
+        --ink: #233044;
+        --muted: #6b7a90;
+        --accent: #ff8a3d;
+        --accent-ink: #ffffff;
+        --opt-bg: #eef4ff;
+        --opt-border: #c9dcff;
+        --sel-bg: #ffe9a8;
+        --sel-border: #ffb020;
+        --good: #2fa84f;
+        --good-bg: #e5f7e9;
+        --bad-bg: #fdecec;
+        --bad: #d9534f;
+        --bar-track: #f0e4cf;
+        --shadow: 0 6px 0 rgba(35, 48, 68, .08);
+        --sec-math: #ff8a3d;
+        --sec-word: #3d9bff;
+        --sec-logic: #8a5cf6;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1d2230;
+          --card: #2a3042;
+          --ink: #f2f5fb;
+          --muted: #a8b4c8;
+          --accent: #ffa25e;
+          --accent-ink: #2a1a08;
+          --opt-bg: #333c55;
+          --opt-border: #4a5878;
+          --sel-bg: #6b5510;
+          --sel-border: #ffb020;
+          --good: #5ecb7d;
+          --good-bg: #1f4630;
+          --bad-bg: #5a2c2c;
+          --bad: #ff8a85;
+          --bar-track: #3a4258;
+          --shadow: 0 6px 0 rgba(0, 0, 0, .35);
+        }
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+      }
+      .wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 48px; }
+
+      header.hero { text-align: center; padding: 10px 4px 4px; }
+      header.hero .mascot { font-size: 54px; line-height: 1; }
+      header.hero h1 { font-size: 30px; margin: 8px 0 6px; letter-spacing: .5px; }
+      header.hero p { font-size: 19px; color: var(--muted); margin: 0 0 14px; line-height: 1.5; }
+
+      .progress-box { background: var(--card); border-radius: 20px; padding: 14px 18px; box-shadow: var(--shadow); margin-bottom: 22px; }
+      .progress-label { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 10px; }
+      .progress-label b { color: var(--accent); font-size: 24px; }
+      .bar { height: 20px; background: var(--bar-track); border-radius: 999px; overflow: hidden; }
+      .bar > div { height: 100%; width: 0%; background: linear-gradient(90deg, #ffb020, #ff8a3d); border-radius: 999px; transition: width .35s ease; }
+
+      .section-title { font-size: 30px; margin: 30px 0 14px; display: flex; align-items: center; gap: 10px; }
+      .section-title span.dot { color: #fff; border-radius: 14px; padding: 2px 12px; font-size: 22px; }
+      .sec-math .dot { background: var(--sec-math); }
+      .sec-word .dot { background: var(--sec-word); }
+      .sec-logic .dot { background: var(--sec-logic); }
+
+      .card { background: var(--card); border-radius: 24px; padding: 22px 18px 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+      .q-num { display: inline-block; font-size: 18px; font-weight: 700; color: var(--muted); background: var(--opt-bg); border-radius: 999px; padding: 3px 14px; margin-bottom: 10px; }
+      .q-text { font-size: 28px; font-weight: 700; line-height: 1.45; margin: 0 0 6px; }
+      .q-visual { font-size: 52px; line-height: 1.5; text-align: center; letter-spacing: 6px; margin: 10px 0 16px; word-break: break-all; }
+      .q-visual.small { font-size: 44px; }
+
+      .options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+      .options.two-col { grid-template-columns: repeat(3, 1fr); }
+      .opt {
+        border: 4px solid var(--opt-border);
+        background: var(--opt-bg);
+        border-radius: 22px;
+        min-height: 104px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+        font-size: 40px; font-weight: 800; color: var(--ink);
+        cursor: pointer; user-select: none;
+        padding: 10px 4px;
+        transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      }
+      .opt .letter { font-size: 17px; font-weight: 700; color: var(--muted); }
+      .opt:active { transform: scale(.96); }
+      .opt.selected { background: var(--sel-bg); border-color: var(--sel-border); transform: scale(1.05); box-shadow: 0 6px 0 rgba(255, 176, 32, .45); }
+      .opt.selected .letter { color: var(--ink); }
+      .opt.emoji { font-size: 46px; }
+      .opt.word { font-size: 56px; }
+
+      body.submitted .opt { cursor: default; }
+      .opt.correct { background: var(--good-bg) !important; border-color: var(--good) !important; }
+      .opt.wrong { background: var(--bad-bg) !important; border-color: var(--bad) !important; }
+      .feedback { display: none; margin-top: 16px; font-size: 21px; line-height: 1.55; border-radius: 16px; padding: 12px 16px; }
+      body.submitted .feedback.show { display: block; }
+      .feedback.ok { background: var(--good-bg); }
+      .feedback.no { background: var(--bad-bg); }
+      .feedback .big { font-size: 26px; font-weight: 800; display: block; margin-bottom: 4px; }
+
+      .submit-zone { text-align: center; margin: 34px 0 8px; }
+      .btn {
+        font-family: inherit; border: none; cursor: pointer; font-weight: 800;
+        border-radius: 999px; padding: 20px 34px; font-size: 26px;
+        background: var(--accent); color: var(--accent-ink);
+        box-shadow: 0 7px 0 rgba(35, 48, 68, .18);
+        transition: transform .12s ease;
+        max-width: 100%;
+      }
+      .btn:active { transform: scale(.97); }
+      .btn.ghost { background: var(--card); color: var(--ink); border: 4px solid var(--opt-border); box-shadow: var(--shadow); }
+      .hint { font-size: 18px; color: var(--muted); margin-top: 12px; }
+
+      .result { display: none; text-align: center; background: var(--card); border-radius: 28px; padding: 30px 20px 26px; margin: 30px 0 8px; box-shadow: var(--shadow); }
+      .result.show { display: block; }
+      .result .fox { font-size: 72px; line-height: 1.2; }
+      .result .stars { font-size: 56px; letter-spacing: 8px; min-height: 70px; }
+      .result .stars .empty { opacity: .25; filter: grayscale(1); }
+      .result .score { font-size: 24px; font-weight: 700; margin: 6px 0 4px; }
+      .result .cheer { font-size: 30px; font-weight: 800; margin: 4px 0 20px; line-height: 1.4; }
+
+      @media (max-width: 480px) {
+        .q-text { font-size: 27px; }
+        .q-visual { font-size: 44px; }
+        .opt { min-height: 96px; font-size: 34px; }
+        .opt.emoji { font-size: 40px; }
+        .opt.word { font-size: 50px; }
+        .btn { font-size: 23px; padding: 18px 24px; }
+        .section-title { font-size: 26px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <div class="mascot">🦊</div>
+        <h1>Kids Quiz · Day 1 · 2026-10-24</h1>
+        <p>点一点你觉得对的答案，选完点下面的按钮看星星！</p>
+      </header>
+
+      <div class="progress-box">
+        <div class="progress-label">已经答了 <b id="doneCount">0</b> / 12 题</div>
+        <div class="bar"><div id="barFill"></div></div>
+      </div>
+
+      <main id="quiz"></main>
+
+      <div class="result" id="result">
+        <div class="fox" id="resultMascot">🦊</div>
+        <div class="stars" id="resultStars"></div>
+        <div class="score" id="resultScore"></div>
+        <div class="cheer" id="resultCheer"></div>
+        <button class="btn ghost" id="resetBtn" type="button">🔁 再玩一次</button>
+      </div>
+
+      <div class="submit-zone" id="submitZone">
+        <button class="btn" id="submitBtn" type="button">⭐ 看看我得了几颗星</button>
+        <div class="hint" id="submitHint">先把 12 道题都选完哦～</div>
+      </div>
+    </div>
+
+    <script>
+      var QUIZ = [
+        { sec: "math",
+          text: "数一数，一共有几个苹果？",
+          visual: "🍎🍎🍎🍎",
+          options: ["3", "4", "5"], optClass: "",
+          answer: 1,
+          explain: "我们一起数：1、2、3、4，一共 4 个苹果！" },
+        { sec: "math",
+          text: "哪个是数字 5？",
+          visual: "",
+          options: ["2", "8", "5"], optClass: "",
+          answer: 2,
+          explain: "5 像一个小钩子，就是它！" },
+        { sec: "math",
+          text: "一共有几个香蕉？",
+          visual: "🍌🍌 ＋ 🍌",
+          options: ["2", "4", "3"], optClass: "",
+          answer: 2,
+          explain: "2 个加 1 个，就是 3 个。" },
+        { sec: "math",
+          text: "哪一边的小狗更多？",
+          visual: "",
+          options: ["🐶🐶", "🐶🐶🐶🐶", "🐶"], optClass: "emoji",
+          answer: 1,
+          explain: "第二边有 4 只小狗，是最多的！" },
+
+        { sec: "word",
+          text: "这是太阳。哪个字是「日」？",
+          visual: "☀️",
+          options: ["月", "日", "山"], optClass: "word",
+          answer: 1,
+          explain: "太阳就是「日」，方方正正的。" },
+        { sec: "word",
+          text: "小鱼在水里游。哪个字是「水」？",
+          visual: "🐟",
+          options: ["火", "木", "水"], optClass: "word",
+          answer: 2,
+          explain: "小鱼离不开水，「水」字中间一竖，两边水花开。" },
+        { sec: "word",
+          text: "大象很大很大。哪个字是「大」？",
+          visual: "🐘",
+          options: ["小", "人", "大"], optClass: "word",
+          answer: 2,
+          explain: "「大」像一个人张开手臂，好大好大！" },
+        { sec: "word",
+          text: "这是嘴巴。哪个字是「口」？",
+          visual: "👄",
+          options: ["目", "口", "耳"], optClass: "word",
+          answer: 1,
+          explain: "嘴巴就是「口」，像一个小方框。" },
+
+        { sec: "logic",
+          text: "接下来应该是什么？",
+          visual: "🔴🔵🔴🔵🔴？",
+          options: ["🔵", "🔴", "🟢"], optClass: "emoji",
+          answer: 0,
+          explain: "红、蓝、红、蓝……轮到蓝色啦！" },
+        { sec: "logic",
+          text: "哪个和大家不一样？",
+          visual: "",
+          options: ["🍓", "🐶", "🍇"], optClass: "emoji",
+          answer: 1,
+          explain: "草莓和葡萄是水果，小狗是小动物，不一样！" },
+        { sec: "logic",
+          text: "哪个是圆圆的？",
+          visual: "",
+          options: ["⭐", "🔺", "⚪"], optClass: "emoji",
+          answer: 2,
+          explain: "白色的圈圈是圆形的，像皮球一样圆。" },
+        { sec: "logic",
+          text: "哪个是交通工具，可以带我们出门？",
+          visual: "",
+          options: ["🍔", "🧦", "🚗"], optClass: "emoji",
+          answer: 2,
+          explain: "汽车是交通工具，可以开着出门玩！" }
+      ];
+
+      var SECTIONS = {
+        math:  { title: "🔢 数学", cls: "sec-math",  tag: "数一数" },
+        word:  { title: "📖 认字", cls: "sec-word",  tag: "认一认" },
+        logic: { title: "🧩 逻辑", cls: "sec-logic", tag: "想一想" }
+      };
+      var LETTERS = ["A", "B", "C"];
+      var answers = new Array(QUIZ.length).fill(null);
+      var submitted = false;
+
+      var quizEl = document.getElementById("quiz");
+      var doneEl = document.getElementById("doneCount");
+      var barEl = document.getElementById("barFill");
+
+      function render() {
+        quizEl.innerHTML = "";
+        var lastSec = null;
+        QUIZ.forEach(function (q, qi) {
+          if (q.sec !== lastSec) {
+            lastSec = q.sec;
+            var h = document.createElement("h2");
+            h.className = "section-title " + SECTIONS[q.sec].cls;
+            h.innerHTML = SECTIONS[q.sec].title + ' <span class="dot">' + SECTIONS[q.sec].tag + "</span>";
+            quizEl.appendChild(h);
+          }
+          var card = document.createElement("section");
+          card.className = "card";
+          card.id = "card-" + qi;
+
+          var num = document.createElement("span");
+          num.className = "q-num";
+          num.textContent = "第 " + (qi + 1) + " 题";
+          card.appendChild(num);
+
+          var t = document.createElement("p");
+          t.className = "q-text";
+          t.textContent = q.text;
+          card.appendChild(t);
+
+          if (q.visual) {
+            var v = document.createElement("div");
+            v.className = "q-visual" + (q.visual.length <= 2 ? " small" : "");
+            v.textContent = q.visual;
+            card.appendChild(v);
+          }
+
+          var opts = document.createElement("div");
+          opts.className = "options";
+          q.options.forEach(function (o, oi) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "opt " + (q.optClass || "");
+            b.setAttribute("aria-label", "选项 " + LETTERS[oi] + "：" + o);
+            var letter = document.createElement("span");
+            letter.className = "letter";
+            letter.textContent = LETTERS[oi];
+            var val = document.createElement("span");
+            val.textContent = o;
+            b.appendChild(letter);
+            b.appendChild(val);
+            b.addEventListener("click", function () { pick(qi, oi); });
+            opts.appendChild(b);
+          });
+          card.appendChild(opts);
+
+          var fb = document.createElement("div");
+          fb.className = "feedback";
+          fb.id = "fb-" + qi;
+          card.appendChild(fb);
+
+          quizEl.appendChild(card);
+        });
+        updateProgress();
+      }
+
+      function updateProgress() {
+        var done = answers.filter(function (a) { return a !== null; }).length;
+        doneEl.textContent = done;
+        barEl.style.width = (done / QUIZ.length * 100) + "%";
+        var hint = document.getElementById("submitHint");
+        if (!submitted) {
+          hint.textContent = done === QUIZ.length
+            ? "全部选完啦，点按钮看看你的星星！"
+            : "还差 " + (QUIZ.length - done) + " 道题，慢慢来～";
+        }
+      }
+
+      function pick(qi, oi) {
+        if (submitted) return;
+        answers[qi] = oi;
+        var card = document.getElementById("card-" + qi);
+        var opts = card.querySelectorAll(".opt");
+        opts.forEach(function (el, i) {
+          el.classList.toggle("selected", i === oi);
+        });
+        updateProgress();
+      }
+
+      function submit() {
+        var done = answers.filter(function (a) { return a !== null; }).length;
+        if (done < QUIZ.length) {
+          var first = answers.indexOf(null);
+          document.getElementById("card-" + first).scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+        submitted = true;
+        document.body.classList.add("submitted");
+        var correct = 0;
+        QUIZ.forEach(function (q, qi) {
+          var card = document.getElementById("card-" + qi);
+          var opts = card.querySelectorAll(".opt");
+          var isRight = answers[qi] === q.answer;
+          if (isRight) correct++;
+          opts.forEach(function (el, i) {
+            el.classList.remove("selected");
+            if (i === q.answer) el.classList.add("correct");
+            else if (i === answers[qi]) el.classList.add("wrong");
+          });
+          var fb = document.getElementById("fb-" + qi);
+          fb.className = "feedback show " + (isRight ? "ok" : "no");
+          fb.innerHTML = isRight
+            ? '<span class="big">🎉 答对啦！</span>' + q.explain
+            : '<span class="big">💪 就差一点点！</span>' + q.explain;
+        });
+
+        var stars, cheer, mascot = "🦊";
+        if (correct === 12)      { stars = 3; cheer = "太棒了！全部答对！"; }
+        else if (correct >= 9)   { stars = 2; cheer = "很厉害！"; }
+        else if (correct >= 5)   { stars = 1; cheer = "做得好，继续加油！"; }
+        else                     { stars = 0; cheer = "没关系，再试一次，你可以的！"; mascot = "🐰"; }
+
+        var starHtml = "";
+        for (var i = 0; i < 3; i++) {
+          starHtml += i < stars ? "⭐" : '<span class="empty">⭐</span>';
+        }
+        document.getElementById("resultStars").innerHTML = starHtml;
+        document.getElementById("resultMascot").textContent = mascot;
+        document.getElementById("resultScore").textContent = "答对了 " + correct + " / 12 题";
+        document.getElementById("resultCheer").textContent = cheer;
+        document.getElementById("result").classList.add("show");
+        document.getElementById("submitZone").style.display = "none";
+        document.getElementById("result").scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      function reset() {
+        answers = new Array(QUIZ.length).fill(null);
+        submitted = false;
+        document.body.classList.remove("submitted");
+        document.getElementById("result").classList.remove("show");
+        document.getElementById("submitZone").style.display = "";
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      document.getElementById("submitBtn").addEventListener("click", submit);
+      document.getElementById("resetBtn").addEventListener("click", reset);
+      render();
+    </script>
+  </body>
+</html>
